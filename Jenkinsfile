@@ -5,12 +5,18 @@ pipeline {
         }
     }
 environment {
-    PATH= "/usr/lib/jvm/java-11-openjdk-amd64/bin:$PATH"
-    PATH = "/opt/apache-maven-3.9.9/bin:$PATH"
-}
+    JAVA_HOME = '/usr/lib/jvm/java-11-openjdk-amd64' // Replace with your actual JAVA_HOME path
+    MAVEN_HOME = '/opt/apache-maven-3.9.9' // Replace with your actual Maven path
+    PATH = "${MAVEN_HOME}/bin:${JAVA_HOME}/bin:${env.PATH}"
+    }
+//     PATH= "/usr/lib/jvm/java-11-openjdk-amd64/bin:$PATH"
+//     PATH = "/opt/apache-maven-3.9.9/bin:$PATH"
+// }
     stages {
         stage("build") {
             steps {
+                sh 'java -version'
+                sh 'mvn -version'
                 sh 'mvn clean deploy'
             }
         }
