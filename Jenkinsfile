@@ -5,7 +5,7 @@ pipeline {
         }
     }
 environment {
-    JAVA_HOME = '/usr/lib/jvm/java-11-openjdk-amd64' // Replace with your actual JAVA_HOME path
+    JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64' // Replace with your actual JAVA_HOME path
     MAVEN_HOME = '/opt/apache-maven-3.9.9' // Replace with your actual Maven path
     PATH = "${MAVEN_HOME}/bin:${JAVA_HOME}/bin:${env.PATH}"
     }
