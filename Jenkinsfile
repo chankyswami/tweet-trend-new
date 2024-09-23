@@ -1,4 +1,4 @@
-def registry = 'https://chanky.jfrog.io/'
+def registry = 'https://chanky.jfrog.io/artifactory/api/maven/chanky03'
 pipeline {
     agent {
         node {
@@ -25,7 +25,8 @@ environment {
             steps {
                 script {
                         echo '<--------------- Jar Publish Started --------------->'
-                        def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"artifactory-cred"
+                        // def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"artifactory-cred"
+                        def server = Artifactory.newServer url:registry,  credentialsId:"artifactory-cred"
                         def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
                         def uploadSpec = """{
                             "files": [
