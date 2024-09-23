@@ -1,4 +1,4 @@
-def registry = 'https://chanky.jfrog.io/artifactory/api/maven/chanky03'
+def registry = 'https://chanky.jfrog.io/artifactory/chanky03/'
 pipeline {
     agent {
         node {
