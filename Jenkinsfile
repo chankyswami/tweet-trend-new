@@ -1,4 +1,6 @@
-def registry = 'https://chanky.jfrog.io/artifactory/chanky03/'
+def registry = 'https://chanky.jfrog.io/chanky-docker'
+def imageName = 'chanky.jfrog.io/chanky-docker-local/ttrend'
+def version   = '2.1.2'
 pipeline {
     agent {
         node {
@@ -21,32 +23,54 @@ environment {
                 sh 'mvn clean deploy'
             }
         }
-        stage("Jar Publish") {
+
+        stage(" Docker Build ") {
             steps {
                 script {
-                        echo '<--------------- Jar Publish Started --------------->'
-                        // def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"artifactory-cred"
-                        def server = Artifactory.newServer url:registry,  credentialsId:"artifactory-cred"
-                        def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
-                        def uploadSpec = """{
-                            "files": [
-                                {
-                                "pattern": "jarstaging/(*)",
-                                "target": "libs-release-local/{1}",
-                                "flat": "false",
-                                "props" : "${properties}",
-                                "exclusions": [ "*.sha1", "*.md5"]
-                                }
-                            ]
-                        }"""
-                        def buildInfo = server.upload(uploadSpec)
-                        buildInfo.env.collect()
-                        server.publishBuildInfo(buildInfo)
-                        echo '<--------------- Jar Publish Ended --------------->'  
-                
+                echo '<--------------- Docker Build Started --------------->'
+                app = docker.build(imageName+":"+version)
+                echo '<--------------- Docker Build Ends --------------->'
                 }
-            }   
+            }
         }
+
+        stage (" Docker Publish "){
+            steps {
+                script {
+                echo '<--------------- Docker Publish Started --------------->'  
+                    docker.withRegistry(registry, 'artifactory-cred'){
+                        app.push()
+                    }    
+                echo '<--------------- Docker Publish Ended --------------->'  
+                }
+            }
+        }
+        // stage("Jar Publish") {
+        //     steps {
+        //         script {
+        //                 echo '<--------------- Jar Publish Started --------------->'
+        //                 // def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"artifactory-cred"
+        //                 def server = Artifactory.newServer url:registry,  credentialsId:"artifactory-cred"
+        //                 def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
+        //                 def uploadSpec = """{
+        //                     "files": [
+        //                         {
+        //                         "pattern": "jarstaging/(*)",
+        //                         "target": "libs-release-local/{1}",
+        //                         "flat": "false",
+        //                         "props" : "${properties}",
+        //                         "exclusions": [ "*.sha1", "*.md5"]
+        //                         }
+        //                     ]
+        //                 }"""
+        //                 def buildInfo = server.upload(uploadSpec)
+        //                 buildInfo.env.collect()
+        //                 server.publishBuildInfo(buildInfo)
+        //                 echo '<--------------- Jar Publish Ended --------------->'  
+                
+        //         }
+        //     }   
+        // }
 //         stage('SonarQube analysis') {
 //             environment {
 //                 scannerHome = tool 'chanky-sonar-scanner' // must match the name of an actual scanner installation directory on your Jenkins build agent
